@@ -16,7 +16,9 @@ async function onFormSubmit(e) {
   searchData = e.currentTarget.searchQuery.value;
   page = 1;
   if (searchData.trim() === '') {
-    Notiflix.Notify.failure('Please enter your search data.');
+    Notiflix.Notify.failure('Please enter your search data.', {
+      clickToClose: true,
+    });
     return;
   }
   const response = await fetchPixabay(searchData, page);
@@ -31,12 +33,15 @@ async function onFormSubmit(e) {
   if (response.totalHits === 0) {
     clearGallery();
     Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again!'
+      'Sorry, there are no images matching your search query. Please try again!',
+      { clickToClose: true }
     );
   }
   try {
     if (response.totalHits > 0) {
-      Notiflix.Notify.info(`Hooray! We found ${response.totalHits} images`);
+      Notiflix.Notify.info(`Hooray! We found ${response.totalHits} images`, {
+        clickToClose: true,
+      });
       clearGallery();
       renderCardMarkup(response.hits);
     }
@@ -57,7 +62,8 @@ async function onLoadMore() {
     scroll();
     if (perPage <= response.totalHits) {
       Notiflix.Notify.failure(
-        "We're sorry, but you've reached the end of search results."
+        "We're sorry, but you've reached the end of search results.",
+        { clickToClose: true }
       );
       addIsHidden();
     }
