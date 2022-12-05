@@ -1,6 +1,6 @@
 import { refs } from './js/refs';
 import fetchPixabay from './js/pixabay';
-import scroll from './js/scroll';
+import easyScroll from './js/scroll';
 import Notiflix from 'notiflix';
 import simpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -10,6 +10,7 @@ refs.form.addEventListener('submit', onFormSubmit);
 let searchData = '';
 let page = 1;
 let perPage = 0;
+let loadPages = 0;
 
 async function onFormSubmit(e) {
   e.preventDefault();
@@ -59,8 +60,8 @@ async function onLoadMore() {
     const response = await fetchPixabay(searchData, page);
     renderCardMarkup(response.hits);
     perPage += response.hits.length;
-    scroll();
-    if (perPage <= response.totalHits) {
+    easyScroll();
+    if (perPage >= response.totalHits) {
       Notiflix.Notify.failure(
         "We're sorry, but you've reached the end of search results.",
         { clickToClose: true }
@@ -96,7 +97,7 @@ function renderCardMarkup(hits) {
         largeImageURL,
       }) => {
         return `<div class="photo-card">
-  <a class='photo-card__link' href='${largeImageURL}'><img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
+  <a class='photo-card__link' href='${largeImageURL}'><img src="${webformatURL}" alt="${tags}" loading="lazy" width="360" height="240" /></a>
   <div class="info">
     <p class="info-item">
       <b>Likes</b>
@@ -133,8 +134,26 @@ function removeIsHidden() {
 
 function pageIncrement() {
   page += 1;
+  loadPages += perPage;
 }
 
 function clearGallery() {
   refs.gallery.innerHTML = '';
+}
+
+// infinite scroll
+
+window.addEventListener('scroll', () => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  // console.log({ scrollTop, scrollHeight, clientHeight });
+
+  if (clientHeight + scrollTop >= scrollHeight - 5) {
+    showLoading();
+  }
+});
+
+function showLoading() {
+  refs.body.style.paddingBottom = '100px';
+  onLoadMore();
 }

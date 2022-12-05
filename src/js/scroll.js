@@ -1,4 +1,4 @@
-export default function scroll() {
+export default function easyScroll() {
   const { height: cardHeight } = document
     .querySelector('.gallery')
     .firstElementChild.getBoundingClientRect();
